@@ -1,0 +1,28 @@
+# ==========================================
+# 🛑 OFFICIAL MICROSOFT .NET SOURCE ENGINE RULES
+# ==========================================
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+*.sln.docstates
+
+# ==========================================
+# 🛑 JETBRAINS RIDER & IDEA WORKSPACE CACHES
+# ==========================================
+.idea/
+*.sln.iml
+.metadata/
+
+# ==========================================
+# 🛑 SYSTEM COMPILING LOGS & USER SECRETS
+# ==========================================
+*.log
+.secrets/
+out/
+dist/
+
+# ==========================================
+# 🛑 ENVIRONMENT DEPENDENCY KEYS (CRITICAL SECURITY)
+# ==========================================
+appsettings.Development.json

@@ -1,0 +1,23 @@
+@HostAddress = http://localhost:5156
+@AuthToken = {{loginRequest.response.body.token}}
+
+GET {{HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+POST {{HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "dev-tester@email.com",
+  "password":"Asd1234!"
+}
+
+###
+POST {{HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "dev-tester@email.com",
+  "password":"Asd1234!"
+}

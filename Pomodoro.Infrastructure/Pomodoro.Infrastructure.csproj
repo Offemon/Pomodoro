@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Data\Interceptors\" />
+      <Folder Include="Data\Migrations\" />
+      <Folder Include="Services\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+      <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.19.2" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Pomodoro.Domain\Pomodoro.Domain.csproj" />
+      <ProjectReference Include="..\Pomodoro.Application\Pomodoro.Application.csproj" />
+    </ItemGroup>
+
+</Project>

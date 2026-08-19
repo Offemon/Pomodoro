@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pomodoro.Domain", "Pomodoro.Domain\Pomodoro.Domain.csproj", "{3537FC33-0C89-4DEB-9500-1CC6B6557CA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pomodoro.Application", "Pomodoro.Application\Pomodoro.Application.csproj", "{51D38D4E-0BF7-4EDF-AA80-C5DAA6427875}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pomodoro.WebApi", "Pomodoro.WebApi\Pomodoro.WebApi.csproj", "{D2E67D1D-15C7-4FFB-9680-C10CAF43E506}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pomodoro.Infrastructure", "Pomodoro.Infrastructure\Pomodoro.Infrastructure.csproj", "{58F4512B-5480-483F-9F2B-25A0CAADABC7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3537FC33-0C89-4DEB-9500-1CC6B6557CA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3537FC33-0C89-4DEB-9500-1CC6B6557CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3537FC33-0C89-4DEB-9500-1CC6B6557CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3537FC33-0C89-4DEB-9500-1CC6B6557CA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51D38D4E-0BF7-4EDF-AA80-C5DAA6427875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51D38D4E-0BF7-4EDF-AA80-C5DAA6427875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51D38D4E-0BF7-4EDF-AA80-C5DAA6427875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51D38D4E-0BF7-4EDF-AA80-C5DAA6427875}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2E67D1D-15C7-4FFB-9680-C10CAF43E506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2E67D1D-15C7-4FFB-9680-C10CAF43E506}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2E67D1D-15C7-4FFB-9680-C10CAF43E506}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2E67D1D-15C7-4FFB-9680-C10CAF43E506}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F4512B-5480-483F-9F2B-25A0CAADABC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F4512B-5480-483F-9F2B-25A0CAADABC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F4512B-5480-483F-9F2B-25A0CAADABC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F4512B-5480-483F-9F2B-25A0CAADABC7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
