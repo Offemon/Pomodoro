@@ -1,6 +1,7 @@
 using Pomodoro.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Pomodoro.Domain.Enums;
 
 namespace Pomodoro.Infrastructure.Data.Configurations;
 
@@ -27,5 +28,14 @@ public class ToDoTaskConfiguration : IEntityTypeConfiguration<ToDoTask>
             .IsRequired();
         builder.Property(t => t.DueDate);
         builder.Property(t => t.UpdatedAt);
+        builder.Property(t => t.IsAbandoned)
+            .IsRequired()
+            .HasDefaultValue(false);
+        builder.Property(t => t.IsPriority)
+            .IsRequired()
+            .HasDefaultValue(false);
+        builder.Property(t => t.EnergyLevel)
+            .IsRequired()
+            .HasDefaultValue(TaskEnergyLevel.Low);
     }
 }

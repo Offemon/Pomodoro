@@ -1,4 +1,5 @@
 using Mediator;
+using Pomodoro.Domain.Enums;
 
 namespace Pomodoro.Application.Features.Tasks.Commands.UpdateToDoTaskDetails;
 
@@ -8,5 +9,7 @@ public record UpdateToDoTaskDetailsCommand(
         string Title,
         string? Description,
         int EstimatedPomodoros,
-        DateTime? DueDate
+        DateTime? DueDate,
+        bool IsPriority,
+        TaskEnergyLevel EnergyLevel
     ) : IRequest;

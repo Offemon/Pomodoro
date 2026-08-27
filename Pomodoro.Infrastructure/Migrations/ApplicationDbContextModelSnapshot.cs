@@ -17,7 +17,7 @@ namespace Pomodoro.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -52,6 +52,37 @@ namespace Pomodoro.Infrastructure.Migrations
                     b.ToTable("pomodoro_sessions", (string)null);
                 });
 
+            modelBuilder.Entity("Pomodoro.Domain.Entities.TaskTimelineEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("MetaDataJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime>("OccuredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskId", "OccuredAt");
+
+                    b.ToTable("task_timeline_events", (string)null);
+                });
+
             modelBuilder.Entity("Pomodoro.Domain.Entities.ToDoTask", b =>
                 {
                     b.Property<Guid>("Id")
@@ -71,10 +102,25 @@ namespace Pomodoro.Infrastructure.Migrations
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("EnergyLevel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
                     b.Property<int>("EstimatedPomodoros")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsAbandoned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsPriority")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
@@ -133,6 +179,15 @@ namespace Pomodoro.Infrastructure.Migrations
                     b.HasOne("Pomodoro.Domain.Entities.User", null)
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pomodoro.Domain.Entities.TaskTimelineEvent", b =>
+                {
+                    b.HasOne("Pomodoro.Domain.Entities.ToDoTask", null)
+                        .WithMany()
+                        .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

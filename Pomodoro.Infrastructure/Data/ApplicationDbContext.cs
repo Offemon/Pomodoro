@@ -74,7 +74,7 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
     public async Task<List<ToDoTask>> GetActiveTaskForUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await Set<ToDoTask>()
-            .Where(t => t.UserId == userId && !t.IsCompleted)
+            .Where(t => t.UserId == userId && !t.IsCompleted && !t.IsAbandoned)
             .OrderBy(t => t.DueDate)
             .ToListAsync(cancellationToken);
     }

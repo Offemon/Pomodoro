@@ -27,7 +27,9 @@ public sealed class CreateToDoTaskCommandHandler : IRequestHandler<CreateToDoTas
             request.Title,
             request.Description,
             request.EstimatedPomodoros,
-            request.DueDate
+            request.DueDate,
+            request.IsPriority,
+            request.EnergyLevel
             );
         _context.AddEntity(task);
         await _context.SaveChangesAsync(cancellationToken);

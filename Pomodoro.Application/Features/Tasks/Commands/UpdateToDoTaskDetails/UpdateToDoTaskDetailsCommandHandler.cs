@@ -18,7 +18,14 @@ public class UpdateToDoTaskDetailsCommandHandler : IRequestHandler<UpdateToDoTas
         var task = await _context.GetTaskByIdAsync(request.TaskId, request.UserId, cancellationToken);
         if (task is null)
             throw new KeyNotFoundException($"Task with ID '{request.TaskId}' was not found.");
-        task.UpdateDetails(request.Title, request.Description, request.EstimatedPomodoros, request.DueDate);
+        task.UpdateDetails(
+            request.Title, 
+            request.Description, 
+            request.EstimatedPomodoros, 
+            request.DueDate,
+            request.IsPriority,
+            request.EnergyLevel
+            );
         await _context.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
