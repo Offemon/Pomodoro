@@ -10,7 +10,7 @@ namespace Pomodoro.WebApi.Controllers
 {
     public class SessionsController : ApiControllerBase
     {
-        [HttpPost]
+        [HttpPost("log-session")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -18,12 +18,14 @@ namespace Pomodoro.WebApi.Controllers
         public async Task<IActionResult> LogSession([FromBody] LogPomodoroSessionCommand command,
             CancellationToken cancellationToken)
         {
+            var verifiedUserId = User.GetUserId();
+            command.VerifiedUserId = verifiedUserId;
             var sessionId = await Mediator.Send(command, cancellationToken);
             return CreatedAtAction(nameof(LogSession), new { id = sessionId }, sessionId);
         }
 
         [HttpGet]
-        [ProducesResponseType<List<SessionDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<IEnumerable<SessionDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -34,8 +36,8 @@ namespace Pomodoro.WebApi.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/quick")]
-        [ProducesResponseType<List<SessionDto>>(StatusCodes.Status200OK)]
+        [HttpGet("quick")]
+        [ProducesResponseType<IEnumerable<SessionDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -46,8 +48,8 @@ namespace Pomodoro.WebApi.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/{id}")]
-        [ProducesResponseType<List<SessionDto>>(StatusCodes.Status200OK)]
+        [HttpGet("task/{taskId:guid}")]
+        [ProducesResponseType<IEnumerable<SessionDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

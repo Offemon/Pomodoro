@@ -16,15 +16,15 @@ public sealed class LogPomodoroSessionCommandHandler : IRequestHandler<LogPomodo
     }
     public async ValueTask<Guid> Handle(LogPomodoroSessionCommand request, CancellationToken cancellationToken)
     {
-        var userExists = await _context.UserExistsAsync(request.UserId, cancellationToken);
+        var userExists = await _context.UserExistsAsync(request.VerifiedUserId, cancellationToken);
         if (!userExists)
         {
-            throw new KeyNotFoundException($"User with ID '{request.UserId}' not found.");
+            throw new KeyNotFoundException($"User with ID '{request.VerifiedUserId}' not found.");
         }
 
         if (request.ToDoTaskId.HasValue)
         {
-            var taskValid = await _context.TaskExistsForUserAsync(request.ToDoTaskId.Value, request.UserId, cancellationToken);
+            var taskValid = await _context.TaskExistsForUserAsync(request.ToDoTaskId.Value, request.VerifiedUserId, cancellationToken);
             if (!taskValid)
                 throw new UnauthorizedAccessException(
                     "The specified Task does not exist or does not belong to this user");
@@ -32,7 +32,7 @@ public sealed class LogPomodoroSessionCommandHandler : IRequestHandler<LogPomodo
 
         var session = new PomodoroSession(
                 Guid.NewGuid(), 
-                request.UserId,
+                request.VerifiedUserId,
                 request.ToDoTaskId,
                 request.DurationMinutes
             );
@@ -42,7 +42,7 @@ public sealed class LogPomodoroSessionCommandHandler : IRequestHandler<LogPomodo
         if (request.ToDoTaskId.HasValue)
         {
             await _mediator.Send(
-                    new IncrementTaskPomodoroCommand(request.ToDoTaskId.Value, request.UserId),
+                    new IncrementTaskPomodoroCommand(request.ToDoTaskId.Value, request.VerifiedUserId),
                     cancellationToken
                 );
         }

@@ -6,10 +6,9 @@ public class LogPomodoroSessionCommandValidator : AbstractValidator<LogPomodoroS
 {
     public LogPomodoroSessionCommandValidator()
     {
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("User Id is required");
         RuleFor(x => x.DurationMinutes)
             .NotEmpty().WithMessage("Duration is required")
-            .Equal(25).WithMessage("Duration must be greater than 0");       
+            .GreaterThan(0).WithMessage("Duration must be greater than 0")
+            .LessThanOrEqualTo(25).WithMessage("Duration must be 1 to 25 minutes.");
     }
 }

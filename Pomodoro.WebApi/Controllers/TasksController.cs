@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Pomodoro.Application.Features.Tasks.Commands.CompleteToDoTask;
+using Pomodoro.Application.Features.Tasks.Commands.CompleteToDoTaskWithSession;
 using Pomodoro.Application.Features.Tasks.Commands.CreateToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.DeleteToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.IncrementTaskPomodoro;
 using Pomodoro.Application.Features.Tasks.Commands.UpdateToDoTaskDetails;
 using Pomodoro.Application.Features.Tasks.Common;
 using Pomodoro.Application.Features.Tasks.Queries.GetActiveTasks;
+using Pomodoro.Application.Features.Tasks.Queries.GetAllTasks;
 using Pomodoro.Application.Features.Tasks.Queries.GetTask;
 using Pomodoro.WebApi.Extensions;
 
@@ -41,15 +43,36 @@ namespace Pomodoro.WebApi.Controllers
             var response = await Mediator.Send(new GetActiveTaskQuery(verifiedUserId), cancellationToken);
             return Ok(response);
         }
-        
 
-        [HttpPut("{id}/complete")]
+        [HttpGet]
+        [ProducesResponseType<IEnumerable<TaskDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAllTask(CancellationToken cancellationToken)
+        {
+            var verifiedUserId = User.GetUserId();
+            var response = await Mediator.Send(new GetAllTasksQuery(verifiedUserId), cancellationToken);
+            return Ok(response);
+        }
+
+        [HttpPut("{id:guid}/complete")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Complete(Guid id, CancellationToken cancellationToken)
         {
             var verifiedUserId = User.GetUserId();
             await Mediator.Send(new CompleteToDoTaskCommand(id, verifiedUserId), cancellationToken);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}/complete-with-session")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> CompleteWithSession(Guid taskKd, [FromBody] CompleteToDoTaskWithSessionCommand command,
+            CancellationToken cancellationToken)
+        {
+            var verifiedUserId = User.GetUserId();
+            command.ToDoTaskId = taskKd;
+            command.UserId = verifiedUserId;
+            await Mediator.Send(command, cancellationToken);
             return NoContent();
         }
 

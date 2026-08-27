@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Storage;
 using Pomodoro.Domain.Entities;
 namespace Pomodoro.Application.Common.Interfaces;
 
@@ -13,10 +14,13 @@ public interface IApplicationDbContext
     Task<bool> TaskExistsForUserAsync(Guid taskId, Guid userId, CancellationToken cancellationToken = default);
     Task<bool> IsEmailUniqueAsync(string email, CancellationToken cancellationToken = default);
     Task<List<ToDoTask>> GetActiveTaskForUserAsync(Guid userId, CancellationToken cancellationToken= default);
+    Task<List<ToDoTask>> GetAllTasksForUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<ToDoTask?> GetTaskByIdAsync(Guid taskId, Guid userId, CancellationToken cancellationToken = default);
     Task<List<PomodoroSession>> GetTaskSessionsAsync(Guid taskId, Guid userId, CancellationToken cancellationToken = default);
     Task<List<PomodoroSession>> GetAllSessionsAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<List<PomodoroSession>> GetQuickSessionsAsync(Guid userId, CancellationToken cancellationToken = default);
     void AddEntity<TEntity>(TEntity entity) where TEntity : class;
     void RemoveEntity<TEntity>(TEntity entity) where TEntity : class;
+
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }

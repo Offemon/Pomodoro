@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Pomodoro.Application.Common.Interfaces;
 using Pomodoro.Domain.Common.Interfaces;
 using Pomodoro.Domain.Entities;
@@ -78,6 +79,15 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<ToDoTask>> GetAllTasksForUserAsync(Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Set<ToDoTask>()
+            .Where(t => t.UserId == userId)
+            .OrderBy(t => t.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<ToDoTask?> GetTaskByIdAsync(Guid taskId, Guid userId,
         CancellationToken cancellationToken = default)
     {
@@ -120,5 +130,10 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
     public void RemoveEntity<TEntity>(TEntity entity) where TEntity : class
     {
         Set<TEntity>().Remove(entity);
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        return await Database.BeginTransactionAsync(cancellationToken);
     }
 }
