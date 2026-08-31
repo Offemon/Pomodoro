@@ -9,5 +9,8 @@ public record TaskDto(
         int EstimatedPomodoros,
         int CompletedPomodoros,
         DateTime? DueDate,
-        DateTime? UpdatedAt
+        DateTime? UpdatedAt,
+        bool IsAbandoned,
+        bool IsPriority,
+        int EnergyLevel
     );

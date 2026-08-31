@@ -7,15 +7,18 @@ public static class TaskExtensions
     public static TaskDto ToDto(this ToDoTask entity)
     {
         return new TaskDto(
-                entity.Id,
-                entity.Title,
-                entity.Description,
-                entity.CreatedAt,
-                entity.IsCompleted,
-                entity.EstimatedPomodoros,
-                entity.CompletedPomodoros,
-                entity.DueDate,
-                entity.UpdatedAt
-            );
+            Id: entity.Id,
+            Title: entity.Title,
+            Description: entity.Description,
+            CreatedAt: entity.CreatedAt,
+            IsCompleted: entity.IsCompleted,
+            EstimatedPomodoros: entity.EstimatedPomodoros,
+            CompletedPomodoros: entity.CompletedPomodoros,
+            DueDate: entity.DueDate,
+            UpdatedAt: entity.UpdatedAt,
+            IsAbandoned: entity.IsAbandoned,
+            IsPriority: entity.IsPriority,
+            EnergyLevel: (int)entity.EnergyLevel
+        );
     }
 }

@@ -4,6 +4,7 @@ using Pomodoro.Application.Features.Tasks.Commands.CompleteToDoTaskWithSession;
 using Pomodoro.Application.Features.Tasks.Commands.CreateToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.DeleteToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.IncrementTaskPomodoro;
+using Pomodoro.Application.Features.Tasks.Commands.ToggleToDoTaskPriority;
 using Pomodoro.Application.Features.Tasks.Commands.UpdateToDoTaskDetails;
 using Pomodoro.Application.Features.Tasks.Common;
 using Pomodoro.Application.Features.Tasks.Queries.GetActiveTasks;
@@ -64,13 +65,24 @@ namespace Pomodoro.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id:guid}/complete-with-session")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> CompleteWithSession(Guid taskKd, [FromBody] CompleteToDoTaskWithSessionCommand command,
+        [HttpPut("{taskId:guid}/toggle-priority")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ToggleTaskPriority([FromRoute] Guid taskId, CancellationToken cancellationToken)
+        {
+            var verifiedUserId = User.GetUserId();
+            await Mediator.Send(new ToggleToDoTaskPriorityCommand(taskId, verifiedUserId), cancellationToken);
+            return NoContent();
+        }
+        
+        [HttpPut("{taskId:guid}/complete-with-session")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CompleteWithSession([FromRoute]Guid taskId, [FromBody] CompleteToDoTaskWithSessionCommand command,
             CancellationToken cancellationToken)
         {
             var verifiedUserId = User.GetUserId();
-            command.ToDoTaskId = taskKd;
+            command.ToDoTaskId = taskId;
             command.UserId = verifiedUserId;
             await Mediator.Send(command, cancellationToken);
             return NoContent();
@@ -79,7 +91,7 @@ namespace Pomodoro.WebApi.Controllers
         [HttpPut("{id}/increment-pomodoro")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> IncrementPomodoro(Guid id,
+        public async Task<IActionResult> IncrementPomodoro([FromRoute] Guid id,
             CancellationToken cancellationToken)
         {
             var verifiedUserId = User.GetUserId();
