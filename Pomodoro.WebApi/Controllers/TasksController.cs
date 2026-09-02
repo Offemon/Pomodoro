@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Pomodoro.Application.Features.Tasks.Commands.AbandonToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.CompleteToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.CompleteToDoTaskWithSession;
 using Pomodoro.Application.Features.Tasks.Commands.CreateToDoTask;
@@ -72,6 +73,17 @@ namespace Pomodoro.WebApi.Controllers
         {
             var verifiedUserId = User.GetUserId();
             await Mediator.Send(new ToggleToDoTaskPriorityCommand(taskId, verifiedUserId), cancellationToken);
+            return NoContent();
+        }
+
+        [HttpPut("{taskId:guid}/abandon-task")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AbandonToDoTask([FromRoute]Guid taskId, CancellationToken cancellationToken)
+        {
+            var verifiedUserId = User.GetUserId();
+            await Mediator.Send(new AbandonToDoTaskCommand(taskId, verifiedUserId),cancellationToken);
             return NoContent();
         }
         

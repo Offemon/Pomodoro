@@ -25,7 +25,6 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
         Description = description;
         CompletedPomodoros = 0;
         EstimatedPomodoros = estimatedPomodoros;
-        CreatedAt = DateTime.UtcNow;   
         DueDate = dueDate;
         IsAbandoned = false;
         IsPriority = isPriority;
@@ -43,17 +42,24 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
     public DateTime? UpdatedAt { get; private set; }
     public bool IsAbandoned { get; private set; }
     public bool IsPriority { get; private set; }
-
     public TaskEnergyLevel EnergyLevel { get; private set; }
 
     public void Complete()
     {
+        if (IsCompleted)
+            return;
+        if (IsAbandoned)
+            throw new InvalidOperationException("Cannot complete an abandoned task.");
         IsCompleted = true;
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void IncrementCompletedPomodoros()
     {
+        if (IsCompleted)
+            throw new InvalidOperationException("Cannot perform operation on completed task");
+        if (IsAbandoned)
+            throw new InvalidOperationException("Cannot perform operation on abandoned task.");
         CompletedPomodoros++;
         UpdatedAt = DateTime.UtcNow;
     }
@@ -62,18 +68,28 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
     {
         if (IsCompleted)
             throw new InvalidOperationException("A completed task cannot be abandoned.");
+        if (IsAbandoned)
+            return;
         IsAbandoned = true;
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void TogglePriority()
     {
+        if (IsCompleted)
+            throw new InvalidOperationException("Cannot perform operation on completed task");
+        if (IsAbandoned)
+            throw new InvalidOperationException("Cannot perform operation on abandoned task.");
         IsPriority = !IsPriority;
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void UpdateEnergyLevel(TaskEnergyLevel newEnergyLevel)
     {
+        if (IsCompleted)
+            throw new InvalidOperationException("Cannot perform operation on completed task");
+        if (IsAbandoned)
+            throw new InvalidOperationException("Cannot perform operation on abandoned task.");
         EnergyLevel = newEnergyLevel;
         UpdatedAt = DateTime.UtcNow;
     }
@@ -82,6 +98,10 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
     {
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Task title cannot be empty");
+        if (IsCompleted)
+            throw new InvalidOperationException("Cannot perform operation on completed task");
+        if (IsAbandoned)
+            throw new InvalidOperationException("Cannot perform operation on abandoned task.");
         Title = title;
         Description = description;
         EstimatedPomodoros = estimatedPomodoros;
