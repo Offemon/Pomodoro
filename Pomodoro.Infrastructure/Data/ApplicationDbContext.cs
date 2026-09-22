@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pomodoro.Application.Common.Interfaces;
 using Pomodoro.Domain.Common.Interfaces;
 using Pomodoro.Domain.Entities;
@@ -22,6 +23,40 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+            .Properties<DateTime>()
+            .HaveConversion<UtcDateTimeConverter>();
+
+        configurationBuilder
+            .Properties<DateTime?>()
+            .HaveConversion<NullableUtcDateTimeConverter>();
+        base.ConfigureConventions(configurationBuilder);
+    }
+
+    private sealed class UtcDateTimeConverter : ValueConverter<DateTime, DateTime>
+    {
+        public UtcDateTimeConverter() : base(
+                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            )
+        {
+            
+        }
+    }
+
+    private sealed class NullableUtcDateTimeConverter : ValueConverter<DateTime?, DateTime?>
+    {
+        public NullableUtcDateTimeConverter() : base(
+                v => !v.HasValue ? v : (v.Value.Kind == DateTimeKind.Utc ? v : v.Value.ToUniversalTime()),
+                v => !v.HasValue ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+            )
+        {
+            
+        }
+    }
+    
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries())
@@ -36,23 +71,32 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
                 entry.Property(nameof(IHasUpdatedAt.UpdatedAt)).CurrentValue = DateTime.UtcNow;
             }
 
-            if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
-            {
-                foreach (var property in entry.Properties)
-                {
-                    if (property.CurrentValue is DateTime dateTimeValue)
-                    {
-                        if (dateTimeValue.Kind == DateTimeKind.Unspecified)
-                        {
-                            property.CurrentValue = DateTime.SpecifyKind(dateTimeValue, DateTimeKind.Utc);
-                        }
-                        else if (dateTimeValue.Kind == DateTimeKind.Local)
-                        {
-                            property.CurrentValue = dateTimeValue.ToUniversalTime();
-                        }
-                    }
-                }
-            }
+            // foreach (var property in entry.Properties)
+            // {
+            //     if (property.CurrentValue is DateTime dateTimeValue)
+            //     {
+            //         if (dateTimeValue.Kind == DateTimeKind.Unspecified)
+            //         {
+            //             property.CurrentValue = DateTime.SpecifyKind(dateTimeValue, DateTimeKind.Utc);
+            //         }
+            //         else if (dateTimeValue.Kind == DateTimeKind.Local)
+            //         {
+            //             property.CurrentValue = dateTimeValue.ToUniversalTime();
+            //         }
+            //     }
+            //
+            //     if (property.OriginalValue is DateTime originalDateTime)
+            //     {
+            //         if (originalDateTime.Kind == DateTimeKind.Unspecified)
+            //         {
+            //             property.OriginalValue = DateTime.SpecifyKind(originalDateTime, DateTimeKind.Utc);
+            //         }
+            //         else if (originalDateTime.Kind == DateTimeKind.Local)
+            //         {
+            //             property.OriginalValue = originalDateTime.ToUniversalTime();
+            //         }
+            //     }
+            // }
         }
         return base.SaveChangesAsync(cancellationToken);
     }
