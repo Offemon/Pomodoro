@@ -18,7 +18,8 @@ public static class TaskExtensions
             UpdatedAt: entity.UpdatedAt,
             IsAbandoned: entity.IsAbandoned,
             IsPriority: entity.IsPriority,
-            EnergyLevel: (int)entity.EnergyLevel
+            EnergyLevel: (int)entity.EnergyLevel,
+            ModifyCount: entity.ModifyCount
         );
     }
 }

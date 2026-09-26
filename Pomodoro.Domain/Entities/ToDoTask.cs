@@ -18,6 +18,9 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
         
         if (estimatedPomodoros <= 0)
             throw new ArgumentException("Estimated Pomodoros must be greater than 0");
+        
+        if (dueDate.HasValue && dueDate.Value < DateTime.UtcNow.Date.AddHours(1).AddSeconds(-10))
+            throw new ArgumentException("The specified task completion deadline must be scheduled at least one hour into the future.");
         Id = id;
         UserId = userId;
         IsCompleted = false;
@@ -29,6 +32,7 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
         IsAbandoned = false;
         IsPriority = isPriority;
         EnergyLevel = taskEnergyLevel;
+        ModifyCount = 0;
     }
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
@@ -43,6 +47,7 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
     public bool IsAbandoned { get; private set; }
     public bool IsPriority { get; private set; }
     public TaskEnergyLevel EnergyLevel { get; private set; }
+    public int ModifyCount { get; private set; }
 
     public void Complete()
     {
@@ -102,6 +107,9 @@ public class ToDoTask : IHasCreatedAt,IHasUpdatedAt
             throw new InvalidOperationException("Cannot perform operation on completed task");
         if (IsAbandoned)
             throw new InvalidOperationException("Cannot perform operation on abandoned task.");
+        if (dueDate.HasValue && dueDate.Value < DateTime.UtcNow.Date.AddHours(1).AddSeconds(-10))
+            throw new ArgumentException("The specified task completion deadline must be scheduled at least one hour into the future.");
+        ModifyCount++;
         Title = title;
         Description = description;
         EstimatedPomodoros = estimatedPomodoros;

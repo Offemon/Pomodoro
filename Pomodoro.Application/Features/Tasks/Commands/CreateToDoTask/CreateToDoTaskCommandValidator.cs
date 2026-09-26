@@ -17,7 +17,7 @@ public sealed class CreateToDoTaskCommandValidator : AbstractValidator<CreateToD
             .GreaterThan(0).WithMessage("Estimated Pomodoros must be greater than 0")
             .LessThanOrEqualTo(20).WithMessage("Estimated Pomodoros must be less than or equal to 20");
         RuleFor(x => x.DueDate)
-            .Must(date => !date.HasValue || date.Value.Date >= DateTime.UtcNow.Date)
+            .Must(date => !date.HasValue || date.Value.Date >= DateTime.UtcNow.Date.AddHours(1))
             .WithMessage("Due date must be in the past");
     }   
 }

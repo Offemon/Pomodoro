@@ -36,6 +36,10 @@ public class ToDoTaskConfiguration : IEntityTypeConfiguration<ToDoTask>
             .HasDefaultValue(false);
         builder.Property(t => t.EnergyLevel)
             .IsRequired()
-            .HasDefaultValue(TaskEnergyLevel.Low);
+            .HasDefaultValue(TaskEnergyLevel.Low)
+            .HasSentinel((TaskEnergyLevel)1);
+        builder.Property(t => t.ModifyCount)
+            .IsRequired()
+            .HasDefaultValue(0);
     }
 }

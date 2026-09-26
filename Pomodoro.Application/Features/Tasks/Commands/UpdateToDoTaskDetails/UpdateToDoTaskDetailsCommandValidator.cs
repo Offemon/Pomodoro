@@ -15,7 +15,7 @@ public sealed class UpdateToDoTaskDetailsCommandValidator : AbstractValidator<Up
         RuleFor(c => c.EstimatedPomodoros).NotEmpty()
             .GreaterThanOrEqualTo(1).WithMessage("Estimated pomodoro session count should be greater than or equal to one (1)");
         RuleFor(c => c.DueDate)
-            .Must(date => !date.HasValue || date.Value.Date >= DateTime.UtcNow.Date)
+            .Must(date => !date.HasValue || date.Value.Date >= DateTime.UtcNow.Date.AddHours(1))
             .WithMessage("Due dae cannot be set in he past.");
     }
 }

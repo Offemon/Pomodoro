@@ -12,5 +12,6 @@ public record TaskDto(
         DateTime? UpdatedAt,
         bool IsAbandoned,
         bool IsPriority,
-        int EnergyLevel
+        int EnergyLevel,
+        int ModifyCount
     );
