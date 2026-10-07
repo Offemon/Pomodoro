@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 using Pomodoro.Domain.Entities;
 namespace Pomodoro.Application.Common.Interfaces;
@@ -7,7 +8,9 @@ public interface IApplicationDbContext
     IQueryable<User> Users { get; }
     IQueryable<ToDoTask> ToDoTasks { get; }
     IQueryable<PomodoroSession> PomodoroSessions { get; }
-    
+    IDbConnection Connection { get; }
+    bool HasActiveChanges { get; }
+    void UpdateEntity<TEntity>(TEntity entity) where TEntity : class;
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task<bool> UserExistsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);

@@ -5,12 +5,11 @@ public record TaskDto(
         string Title,
         string? Description,
         DateTime CreatedAt,
-        bool IsCompleted,
+        int CurrentState,
         int EstimatedPomodoros,
         int CompletedPomodoros,
         DateTime? DueDate,
         DateTime? UpdatedAt,
-        bool IsAbandoned,
         bool IsPriority,
         int EnergyLevel,
         int ModifyCount

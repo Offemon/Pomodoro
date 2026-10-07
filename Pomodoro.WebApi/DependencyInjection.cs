@@ -3,7 +3,10 @@ using Mediator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Pomodoro.Application.Common.Behaviors;
+using Pomodoro.Infrastructure.Security;
 using Pomodoro.WebApi.Middleware;
+using Asp.Versioning;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Pomodoro.WebApi;
 
@@ -13,9 +16,36 @@ public static class DependencyInjection
 
     public static IServiceCollection AddWebApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new HtmlSanitizerJsonConverter());
+            });
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = new UrlSegmentApiVersionReader();
+        })
+        .AddMvc();
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
+                               throw new InvalidOperationException(
+                                   "PostgreSQL connection string 'DefaultConnection' not found.");
+        services.AddHealthChecks()
+            .AddNpgSql(
+                    connectionString: connectionString,
+                    name: "PostgreSQL-Container",
+                    failureStatus: HealthStatus.Unhealthy,
+                    tags: new[] {"database", "ready"}
+                );
         services.AddExceptionHandler<GlobalExceptionHandler>();
-        services.AddProblemDetails();
+        services.AddProblemDetails(options => 
+                options.CustomizeProblemDetails = context =>
+                {
+                    context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+                }
+            );
         services.AddMediator(options =>
         {
             options.ServiceLifetime = ServiceLifetime.Scoped;

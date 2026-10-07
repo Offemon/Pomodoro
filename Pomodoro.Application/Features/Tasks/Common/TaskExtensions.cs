@@ -11,12 +11,11 @@ public static class TaskExtensions
             Title: entity.Title,
             Description: entity.Description,
             CreatedAt: entity.CreatedAt,
-            IsCompleted: entity.IsCompleted,
+            CurrentState: (int)entity.CurrentState,
             EstimatedPomodoros: entity.EstimatedPomodoros,
             CompletedPomodoros: entity.CompletedPomodoros,
             DueDate: entity.DueDate,
             UpdatedAt: entity.UpdatedAt,
-            IsAbandoned: entity.IsAbandoned,
             IsPriority: entity.IsPriority,
             EnergyLevel: (int)entity.EnergyLevel,
             ModifyCount: entity.ModifyCount

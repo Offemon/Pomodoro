@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pomodoro.Application.Features.Authentication.Commands.LogInUser;
 using Pomodoro.Application.Features.Authentication.Commands.RegisterUser;
 
-namespace Pomodoro.WebApi.Controllers
+namespace Pomodoro.WebApi.Controllers.V1
 {
     [AllowAnonymous]
     public sealed class AuthController : ApiControllerBase

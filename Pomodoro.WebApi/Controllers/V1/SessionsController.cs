@@ -6,7 +6,7 @@ using Pomodoro.Application.Features.Sessions.Queries.GetQuickSessions;
 using Pomodoro.Application.Features.Sessions.Queries.GetTaskSessions;
 using Pomodoro.WebApi.Extensions;
 
-namespace Pomodoro.WebApi.Controllers
+namespace Pomodoro.WebApi.Controllers.V1
 {
     public class SessionsController : ApiControllerBase
     {

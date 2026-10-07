@@ -1,9 +1,11 @@
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pomodoro.Application.Common.Interfaces;
 using Pomodoro.Domain.Common.Interfaces;
 using Pomodoro.Domain.Entities;
+using Pomodoro.Domain.Enums;
 
 namespace Pomodoro.Infrastructure.Data;
 
@@ -17,6 +19,8 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
     public IQueryable<ToDoTask> ToDoTasks => Set<ToDoTask>();
     public IQueryable<PomodoroSession> PomodoroSessions => Set<PomodoroSession>();
 
+    public IDbConnection Connection => Database.GetDbConnection();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -56,6 +60,13 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
             
         }
     }
+
+    public bool HasActiveChanges => ChangeTracker.HasChanges();
+
+    public void UpdateEntity<TEntity>(TEntity entity) where TEntity : class
+    {
+        base.Update(entity);
+    }
     
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -70,33 +81,6 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
             {
                 entry.Property(nameof(IHasUpdatedAt.UpdatedAt)).CurrentValue = DateTime.UtcNow;
             }
-
-            // foreach (var property in entry.Properties)
-            // {
-            //     if (property.CurrentValue is DateTime dateTimeValue)
-            //     {
-            //         if (dateTimeValue.Kind == DateTimeKind.Unspecified)
-            //         {
-            //             property.CurrentValue = DateTime.SpecifyKind(dateTimeValue, DateTimeKind.Utc);
-            //         }
-            //         else if (dateTimeValue.Kind == DateTimeKind.Local)
-            //         {
-            //             property.CurrentValue = dateTimeValue.ToUniversalTime();
-            //         }
-            //     }
-            //
-            //     if (property.OriginalValue is DateTime originalDateTime)
-            //     {
-            //         if (originalDateTime.Kind == DateTimeKind.Unspecified)
-            //         {
-            //             property.OriginalValue = DateTime.SpecifyKind(originalDateTime, DateTimeKind.Utc);
-            //         }
-            //         else if (originalDateTime.Kind == DateTimeKind.Local)
-            //         {
-            //             property.OriginalValue = originalDateTime.ToUniversalTime();
-            //         }
-            //     }
-            // }
         }
         return base.SaveChangesAsync(cancellationToken);
     }
@@ -118,7 +102,7 @@ public class ApplicationDbContext : DbContext,IApplicationDbContext
     public async Task<List<ToDoTask>> GetActiveTaskForUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await Set<ToDoTask>()
-            .Where(t => t.UserId == userId && !t.IsCompleted && !t.IsAbandoned)
+            .Where(t => t.UserId == userId && t.CurrentState == TaskState.Active)
             .OrderBy(t => t.DueDate)
             .ToListAsync(cancellationToken);
     }

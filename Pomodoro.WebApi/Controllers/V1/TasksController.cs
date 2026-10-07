@@ -13,7 +13,7 @@ using Pomodoro.Application.Features.Tasks.Queries.GetAllTasks;
 using Pomodoro.Application.Features.Tasks.Queries.GetTask;
 using Pomodoro.WebApi.Extensions;
 
-namespace Pomodoro.WebApi.Controllers
+namespace Pomodoro.WebApi.Controllers.V1
 {
     public sealed class TasksController : ApiControllerBase
     {

@@ -53,7 +53,8 @@ public class GlobalExceptionHandler : IExceptionHandler
             Status = statusCode,
             Title = title,
             Detail = exception.Message,
-            Instance = httpContext.Request.Path
+            Instance = httpContext.Request.Path,
+            Type = $"https://httpstatuses.io{statusCode}"
         };
         if (errors is not null)
             problemDetails.Extensions.Add("errors", errors);
