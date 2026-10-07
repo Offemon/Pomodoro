@@ -48,7 +48,7 @@ namespace Pomodoro.WebApi.Controllers.V1
             return Ok(response);
         }
 
-        [HttpGet("task/{taskId:guid}")]
+        [HttpGet("{taskId:guid}")]
         [ProducesResponseType<IEnumerable<SessionDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -56,7 +56,7 @@ namespace Pomodoro.WebApi.Controllers.V1
         public async Task<IActionResult> GetTaskSessions([FromRoute] Guid taskId, CancellationToken cancellationToken)
         {
             var verifiedUser = User.GetUserId();
-            var response = await Mediator.Send(new GetTaskSessionsQuery(taskId, verifiedUser), cancellationToken);
+            var response = await Mediator.Send(new GetTaskSessionsQuery(verifiedUser, taskId), cancellationToken);
             return Ok(response);
         }
         

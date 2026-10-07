@@ -19,8 +19,7 @@ public sealed class GetActiveTaskQueryHandler : IRequestHandler<GetActiveTaskQue
 
     public async ValueTask<List<TaskDto>> Handle(GetActiveTaskQuery request, CancellationToken cancellationToken)
     {
-        const string sql = TaskQueries.GetActiveTasks;
-        var tasksEnumerable = await _context.Connection.QueryAsync<ToDoTask>(sql, new
+        var tasksEnumerable = await _context.Connection.QueryAsync<ToDoTask>(TaskQueries.GetActiveTasks, new
         {
             UserId = request.UserId,
             ActiveState = (int)TaskState.Active

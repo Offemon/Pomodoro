@@ -17,8 +17,7 @@ public sealed class GetAllTasksQueryHandler : IRequestHandler<GetAllTasksQuery, 
 
     public async ValueTask<List<TaskDto>> Handle(GetAllTasksQuery query, CancellationToken cancellationToken)
     {
-        const string sql = TaskQueries.GetAllTasks;
-        var tasksEnumerable = await _context.Connection.QueryAsync<ToDoTask>(sql, new
+        var tasksEnumerable = await _context.Connection.QueryAsync<ToDoTask>(TaskQueries.GetAllTasks, new
         {
             UserId = query.UserId
         });

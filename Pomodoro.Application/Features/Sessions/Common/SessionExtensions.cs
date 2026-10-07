@@ -8,6 +8,7 @@ public static class SessionExtensions
     {
         return new SessionDto(
                 entity.Id,
+                entity.ToDoTaskId,
                 entity.DurationMinutes,
                 entity.CompletedAt
             );
