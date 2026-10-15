@@ -1,12 +1,13 @@
 using Mediator;
 using Dapper;
 using Pomodoro.Application.Common.Interfaces;
+using Pomodoro.Application.Common.Models;
 using Pomodoro.Application.Features.Sessions.Common;
 using Pomodoro.Domain.Entities;
 
 namespace Pomodoro.Application.Features.Sessions.Queries.GetAllSessions;
 
-public sealed class GetAllSessionsQueryHandler : IRequestHandler<GetAllSessionsQuery, List<SessionDto>>
+public sealed class GetAllSessionsQueryHandler : IRequestHandler<GetAllSessionsQuery, PagedResult<SessionDto>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -14,13 +15,27 @@ public sealed class GetAllSessionsQueryHandler : IRequestHandler<GetAllSessionsQ
     {
         _context = context;
     }
-    public async ValueTask<List<SessionDto>> Handle(GetAllSessionsQuery request, CancellationToken cancellationToken)
+    public async ValueTask<PagedResult<SessionDto>> Handle(GetAllSessionsQuery request, CancellationToken cancellationToken)
     {
-        var sessionsEnumerable = await _context.Connection.QueryAsync<PomodoroSession>(SessionQueries.GetAllSessions, new
+        SqlMapper.GridReader multiReader = await _context.Connection.QueryMultipleAsync(SessionQueries.GetAllSessionsPaged, new
         {
-            UserId = request.UserId
+            UserId = request.UserId,
+            Take = request.Take,
+            Skip = request.Skip
         });
+        var sessionsEnumerable = await multiReader.ReadAsync<PomodoroSession>();
         var sessions = sessionsEnumerable.ToList();
-        return sessions.Select(s => s.ToDto()).ToList();
+        List<SessionDto> sessionDtos = new List<SessionDto>();
+        foreach (var session in sessions)
+        {
+            sessionDtos.Add(session.ToDto());
+        }
+        int totalCount = await multiReader.ReadSingleAsync<int>();
+        return new PagedResult<SessionDto>(
+                items: sessionDtos,
+                totalCount: totalCount,
+                pageNumber: request.PageNumber,
+                pageSize: request.PageSize
+            );
     }
 }

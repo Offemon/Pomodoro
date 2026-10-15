@@ -1,12 +1,13 @@
 using Dapper;
 using Mediator;
 using Pomodoro.Application.Common.Interfaces;
+using Pomodoro.Application.Common.Models;
 using Pomodoro.Application.Features.Tasks.Common;
 using Pomodoro.Domain.Entities;
 
 namespace Pomodoro.Application.Features.Tasks.Queries.GetAllTasks;
 
-public sealed class GetAllTasksQueryHandler : IRequestHandler<GetAllTasksQuery, List<TaskDto>>
+public sealed class GetAllTasksQueryHandler : IRequestHandler<GetAllTasksQuery, PagedResult<TaskDto>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -15,13 +16,17 @@ public sealed class GetAllTasksQueryHandler : IRequestHandler<GetAllTasksQuery, 
         _context = context;
     }
 
-    public async ValueTask<List<TaskDto>> Handle(GetAllTasksQuery query, CancellationToken cancellationToken)
+    public async ValueTask<PagedResult<TaskDto>> Handle(GetAllTasksQuery query, CancellationToken cancellationToken)
     {
-        var tasksEnumerable = await _context.Connection.QueryAsync<ToDoTask>(TaskQueries.GetAllTasks, new
+        var multiReader = await _context.Connection.QueryMultipleAsync(TaskQueries.GetAllTasksPaged, new
         {
-            UserId = query.UserId
+            UserId = query.UserId,
+            Skip = query.Skip,
+            Take = query.Take
         });
+        var tasksEnumerable = await multiReader.ReadAsync<ToDoTask>();
         List<ToDoTask> tasks = tasksEnumerable.ToList();
+        var totalCount = await multiReader.ReadSingleAsync<int>();
         foreach (ToDoTask task in tasks)
         {
             task.SyncState();
@@ -32,6 +37,12 @@ public sealed class GetAllTasksQueryHandler : IRequestHandler<GetAllTasksQuery, 
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
-        return tasks.Select(t => t.ToDto()).ToList();
+        var taskDtos = tasks.Select(t => t.ToDto()).ToList();
+        return new PagedResult<TaskDto>(
+            items: taskDtos,
+            totalCount: totalCount,
+            pageNumber: query.PageNumber,
+            pageSize: query.PageSize
+        );
     }
 }

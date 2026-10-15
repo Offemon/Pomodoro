@@ -1,12 +1,13 @@
 using Mediator;
 using Dapper;
 using Pomodoro.Application.Common.Interfaces;
+using Pomodoro.Application.Common.Models;
 using Pomodoro.Application.Features.Sessions.Common;
 using Pomodoro.Domain.Entities;
 
 namespace Pomodoro.Application.Features.Sessions.Queries.GetQuickSessions;
 
-public sealed class GetQuickSessionsQueryHandler : IRequestHandler<GetQuickSessionsQuery, List<SessionDto>>
+public sealed class GetQuickSessionsQueryHandler : IRequestHandler<GetQuickSessionsQuery, PagedResult<SessionDto>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -15,14 +16,29 @@ public sealed class GetQuickSessionsQueryHandler : IRequestHandler<GetQuickSessi
         _context = context;
     }
 
-    public async ValueTask<List<SessionDto>> Handle(GetQuickSessionsQuery request, CancellationToken cancellationToken)
+    public async ValueTask<PagedResult<SessionDto>> Handle(GetQuickSessionsQuery request, CancellationToken cancellationToken)
     {
-        var sessionsEnumerable = await _context.Connection.QueryAsync<PomodoroSession>(SessionQueries.GetQuickSessions, new
-        {
-            UserId = request.UserId
-        });
+        SqlMapper.GridReader multiReader =
+            await _context.Connection.QueryMultipleAsync(SessionQueries.GetQuickSessionsPaged, new
+            {
+                UserId = request.UserId,
+                Take = request.Take,
+                Skip = request.Skip
+            });
+
+        var sessionsEnumerable = await multiReader.ReadAsync<PomodoroSession>();
         var sessions = sessionsEnumerable.ToList();
-        return sessions.Select(s => s.ToDto())
-            .ToList();
+        List<SessionDto> sessionsDto = new List<SessionDto>();
+        foreach (PomodoroSession session in sessions)
+        {
+            sessionsDto.Add(session.ToDto());
+        }
+        int totalCount = await multiReader.ReadSingleAsync<int>();
+        return new PagedResult<SessionDto>(
+                items: sessionsDto,
+                totalCount: totalCount,
+                pageNumber: request.PageNumber,
+                pageSize: request.PageSize
+            );
     }
 }
