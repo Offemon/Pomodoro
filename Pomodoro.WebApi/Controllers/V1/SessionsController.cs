@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Pomodoro.Application.Common.Models;
 using Pomodoro.Application.Features.Sessions.Commands.LogPomodoroSession;
 using Pomodoro.Application.Features.Sessions.Common;
 using Pomodoro.Application.Features.Sessions.Queries.GetAllSessions;
@@ -25,38 +26,56 @@ namespace Pomodoro.WebApi.Controllers.V1
         }
 
         [HttpGet]
-        [ProducesResponseType<IEnumerable<SessionDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<PagedResult<SessionDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAllSessions(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllSessions([FromQuery] int pageNumber,[FromQuery] int pageSize,CancellationToken cancellationToken)
         {
             var verifiedUserId = User.GetUserId();
-            var response = await Mediator.Send(new GetAllSessionsQuery(verifiedUserId), cancellationToken);
+            GetAllSessionsQuery query = new GetAllSessionsQuery(verifiedUserId)
+            {
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
+            var response = await Mediator.Send(query, cancellationToken);
             return Ok(response);
         }
 
         [HttpGet("quick")]
-        [ProducesResponseType<IEnumerable<SessionDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<PagedResult<SessionDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetQuickSessions(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetQuickSessions([FromQuery] int pageNumber,[FromQuery] int pageSize,CancellationToken cancellationToken)
         {
             var verifiedUserId = User.GetUserId();
+            GetQuickSessionsQuery query = new GetQuickSessionsQuery(verifiedUserId)
+            {
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
             var response = await Mediator.Send(new GetQuickSessionsQuery(verifiedUserId), cancellationToken);
             return Ok(response);
         }
 
         [HttpGet("{taskId:guid}")]
-        [ProducesResponseType<IEnumerable<SessionDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<PagedResult<SessionDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTaskSessions([FromRoute] Guid taskId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetTaskSessions([FromRoute] Guid taskId, [FromQuery] int pageNumber,[FromQuery] int pageSize, CancellationToken cancellationToken)
         {
             var verifiedUser = User.GetUserId();
-            var response = await Mediator.Send(new GetTaskSessionsQuery(verifiedUser, taskId), cancellationToken);
+            GetTaskSessionsQuery query = new GetTaskSessionsQuery(
+                UserId: verifiedUser,
+                TaskId: taskId
+            )
+            {
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
+            var response = await Mediator.Send(query, cancellationToken);
             return Ok(response);
         }
         

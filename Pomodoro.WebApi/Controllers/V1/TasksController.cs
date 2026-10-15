@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Pomodoro.Application.Common.Models;
 using Pomodoro.Application.Features.Tasks.Commands.AbandonToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.CompleteToDoTask;
 using Pomodoro.Application.Features.Tasks.Commands.CompleteToDoTaskWithSession;
@@ -38,21 +39,31 @@ namespace Pomodoro.WebApi.Controllers.V1
         }
 
         [HttpGet("active")]
-        [ProducesResponseType<IEnumerable<TaskDto>>(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetActiveTasks(CancellationToken cancellationToken)
+        [ProducesResponseType<PagedResult<TaskDto>>(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetActiveTasks([FromQuery] int pageNumber,[FromQuery] int pageSize ,CancellationToken cancellationToken)
         {
             var verifiedUserId = User.GetUserId();
-            var response = await Mediator.Send(new GetActiveTaskQuery(verifiedUserId), cancellationToken);
+            GetActiveTaskQuery query = new GetActiveTaskQuery(UserId: verifiedUserId)
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            var response = await Mediator.Send(query, cancellationToken);
             return Ok(response);
         }
 
         [HttpGet]
-        [ProducesResponseType<IEnumerable<TaskDto>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<PagedResult<TaskDto>>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAllTask(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllTask([FromQuery] int pageNumber,[FromQuery] int pageSize ,CancellationToken cancellationToken)
         {
             var verifiedUserId = User.GetUserId();
-            var response = await Mediator.Send(new GetAllTasksQuery(verifiedUserId), cancellationToken);
+            GetAllTasksQuery query = new GetAllTasksQuery(UserId: verifiedUserId)
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            var response = await Mediator.Send(query, cancellationToken);
             return Ok(response);
         }
 
